@@ -16,7 +16,7 @@ def generate_title_description_with_openai(keyword, brand_name):
 
     try:
         openai.api_key = openai_api_key
-        response = openai.ChatCompletion.create(
+        response = openai.Completion.create(
             model="gpt-3.5-turbo",
             messages=[
                 {"role": "system", "content": "您即將與 AI 談論 SEO 標題和描述的生成。"},
