@@ -1,8 +1,9 @@
-import streamlit as st
+import os
 import openai
+import streamlit as st
 
-
-def generate_title_description_with_openai(keyword, openai_api_key, brand_name):
+def generate_title_description_with_openai(keyword, brand_name):
+    openai_api_key = os.getenv("OPENAI_API_KEY")
     openai.api_key = openai_api_key
 
     prompt_text = (
@@ -53,9 +54,6 @@ def parse_generated_content(content):
 # Streamlit界面的主要部分
 def main():
     st.title("SEO標題和描述生成器")
-
-    # 輸入API密鑰和品牌名稱
-    openai_api_key = "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"
     
     # 側欄標題
     st.sidebar.header("生成SEO單一標題和描述")
@@ -68,8 +66,8 @@ def main():
 
     # 按鈕觸發生成
     if st.button("生成SEO標題和描述"):
-        if openai_api_key and brand_name and keyword:
-            generated_content = generate_title_description_with_openai(keyword, openai_api_key, brand_name)
+        if brand_name and keyword:
+            generated_content = generate_title_description_with_openai(keyword, brand_name)
             title, description = parse_generated_content(generated_content)
             st.subheader("生成的SEO標題")
             st.write(title)
@@ -78,6 +76,5 @@ def main():
         else:
             st.error("請確保所有欄位都填寫完整。")
 
-# 執行Streamlit應用程序
 if __name__ == "__main__":
     main()
