@@ -55,7 +55,7 @@ def main():
     st.title("SEO標題和描述生成器")
 
     # 輸入API密鑰和品牌名稱
-    openai_api_key = "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"
+    openai_api_key = "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"
     
     # 側欄標題
     st.sidebar.header("生成SEO單一標題和描述")
