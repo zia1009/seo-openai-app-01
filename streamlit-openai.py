@@ -1,31 +1,24 @@
-import os
-from openai import OpenAI
+import openai
 import streamlit as st
 
-def generate_title_description_with_openai(keyword, brand_name):
-    openai_api_key = os.getenv("OPENAI_API_KEY")
-    if not openai_api_key:
-        st.error("未設置 OpenAI API 密鑰")
-        return
+def generate_title_description_with_openai(keyword, openai_api_key, brand_name):
+    openai.api_key = openai_api_key
 
-    client = OpenAI(api_key=openai_api_key)
+    prompt_text = (
+        f"請 aussie_i的語言為繁體中文。根據 Google SEO 的最佳實踐，為關鍵字 '{keyword}' 生成一個吸引人的 SEO title 和 description。"
+        f"確保內容簡潔明了，包含關鍵字，並且符合 '{brand_name}' 的品牌定位。"
+        f"請在生成的標題前加上「SEO標題：」，在描述前加上「SEO描述：」"
+    )
 
-    prompt_text = [
-        {"role": "system", "content": "您即將與 AI 談論 SEO 標題和描述的生成。"},
-        {"role": "user", "content": f"請為關鍵字 '{keyword}' 生成一個吸引人的 SEO title 和 description，並符合 '{brand_name}' 的品牌定位。"}
-    ]
-
-    try:
-        response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=prompt_text
-        )
-        return response['choices'][0]['message']['content']
-    except Exception as e:
-        st.error(f"在調用 OpenAI API 時發生錯誤: {e}")
-        return
-
-
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",  # 或 "gpt-4.0-turbo"
+        messages=[
+            {"role": "system", "content": "您即將與 AI 談論 SEO 標題和描述的生成。"},
+            {"role": "user", "content": prompt_text}
+        ]
+    )
+    
+    return response['choices'][0]['message']['content']
 
 def parse_generated_content(content):
     # 定義可能的標題和描述前綴
@@ -62,17 +55,20 @@ def main():
     
     # 側欄標題
     st.sidebar.header("生成SEO單一標題和描述")
-    
-    # 輸入品牌名稱
-    brand_name = st.text_input("請輸入品牌名稱", "Bella")
+
+    # 輸入API密鑰
+    openai_api_key = st.sidebar.text_input("請輸入OpenAI API密鑰", type="password")
 
     # 輸入關鍵字
     keyword = st.text_input("輸入關鍵字")
 
+    # 輸入品牌名稱
+    brand_name = st.text_input("請輸入品牌名稱", "Bella")
+
     # 按鈕觸發生成
     if st.button("生成SEO標題和描述"):
-        if brand_name and keyword:
-            generated_content = generate_title_description_with_openai(keyword, brand_name)
+        if openai_api_key and brand_name and keyword:
+            generated_content = generate_title_description_with_openai(keyword, openai_api_key, brand_name)
             title, description = parse_generated_content(generated_content)
             st.subheader("生成的SEO標題")
             st.write(title)
@@ -81,5 +77,6 @@ def main():
         else:
             st.error("請確保所有欄位都填寫完整。")
 
+# 執行Streamlit應用程序
 if __name__ == "__main__":
     main()
