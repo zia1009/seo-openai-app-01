@@ -4,7 +4,20 @@ import streamlit as st
 
 def generate_title_description_with_openai(keyword, brand_name):
     openai_api_key = os.getenv("OPENAI_API_KEY")
-    openai.api_key = openai_api_key
+    if not openai_api_key:
+        st.error("未設置 OpenAI API 密鑰")
+        return
+
+    try:
+        openai.api_key = openai_api_key
+        # 確保這裡的 API 調用是正確的
+        response = openai.ChatCompletion.create(
+            # 您的 API 調用參數
+        )
+        return response['choices'][0]['message']['content']
+    except Exception as e:
+        st.error(f"在調用 OpenAI API 時發生錯誤: {e}")
+        return
 
     prompt_text = (
         f"請 aussie_i的語言為繁體中文。根據 Google SEO 的最佳實踐，為關鍵字 '{keyword}' 生成一個吸引人的 SEO title 和 description。"
