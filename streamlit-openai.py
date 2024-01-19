@@ -8,32 +8,24 @@ def generate_title_description_with_openai(keyword, brand_name):
         st.error("未設置 OpenAI API 密鑰")
         return
 
-    try:
-        openai.api_key = openai_api_key
-        # 確保這裡的 API 調用是正確的
-        response = openai.ChatCompletion.create(
-            # 您的 API 調用參數
-        )
-        return response['choices'][0]['message']['content']
-    except Exception as e:
-        st.error(f"在調用 OpenAI API 時發生錯誤: {e}")
-        return
-
     prompt_text = (
         f"請 aussie_i的語言為繁體中文。根據 Google SEO 的最佳實踐，為關鍵字 '{keyword}' 生成一個吸引人的 SEO title 和 description。"
         f"確保內容簡潔明了，包含關鍵字，並且符合 '{brand_name}' 的品牌定位。"
         f"請在生成的標題前加上「SEO標題：」，在描述前加上「SEO描述：」"
     )
 
-    response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",  # 或 "gpt-4.0-turbo"
-        messages=[
-            {"role": "system", "content": "您即將與 AI 談論 SEO 標題和描述的生成。"},
-            {"role": "user", "content": prompt_text}
-        ]
-    )
-    
-    return response['choices'][0]['message']['content']
+    try:
+        openai.api_key = openai_api_key
+        response = openai.Completion.create(
+            engine="gpt-3.5-turbo",  # 使用 gpt-3.5-turbo 模型
+            prompt=prompt_text,
+            max_tokens=150
+        )
+        return response['choices'][0]['text'].strip()
+    except Exception as e:
+        st.error(f"在調用 OpenAI API 時發生錯誤: {e}")
+        return
+
 
 def parse_generated_content(content):
     # 定義可能的標題和描述前綴
