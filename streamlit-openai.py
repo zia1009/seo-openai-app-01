@@ -16,12 +16,14 @@ def generate_title_description_with_openai(keyword, brand_name):
 
     try:
         openai.api_key = openai_api_key
-        response = openai.Completion.create(
-            engine="gpt-3.5-turbo",  # 使用 gpt-3.5-turbo 模型
-            prompt=prompt_text,
-            max_tokens=150
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": "您即將與 AI 談論 SEO 標題和描述的生成。"},
+                {"role": "user", "content": prompt_text}
+            ]
         )
-        return response['choices'][0]['text'].strip()
+        return response['choices'][0]['message']['content']
     except Exception as e:
         st.error(f"在調用 OpenAI API 時發生錯誤: {e}")
         return
